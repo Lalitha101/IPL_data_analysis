@@ -113,3 +113,44 @@ matches %>%
   summarize(wins = n(),.groups='drop') %>%
   arrange(city)
 
+#moving average 
+ts<-ts(delivaries$batsman_runs,end=c(2022,2),frequency=4)
+ts
+plot(decompose(ts))
+library(forecast)
+plot(ts)
+summary(ts)
+opar<-par(no.readonly = TRUE)
+par(mfrow=c(2,3))
+ylim<-c(min(ts),max(ts))
+plot(ts, main="raw time series")
+plot(ma(ts,3),main="simple moving average(k=3)",ylim=ylim)
+plot(ma(ts,7),main="simple moving average(k=7)",ylim=ylim)
+plot(ma(ts,15),main="simple moving average(k=7)",ylim=ylim)
+
+k<-log(ts)
+k
+decompose(k)
+g1<-stl(k,s.window = "periodic")
+g1
+plot(g1)
+diff(k)
+ndiffs(k)
+acf_test<-acf(k,lag.max = 40,plot = TRUE)
+acf_test
+library(tseries)
+adf.test(k)
+#the values are stationary
+fit_ets<-ets(k,model = "MMM")
+fit_ets
+plot(forecast(fit_ets,5))
+fit_ets_additive<-ets(k,model = "AAA")
+fit_ets_additive
+plot(forecast(fit_ets_additive,5))
+fit_ets_mam<-ets(k,model = "MAM")
+fit_ets_mam
+fit_ets_ann<-ets(k,model = "ANN")
+fit_ets_ann
+plot(forecast(fit_ets_ann,5))
+#ANN is the best fit model of all the above 
+accuracy(fit_ets_ann)
